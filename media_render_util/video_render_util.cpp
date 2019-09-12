@@ -26,15 +26,19 @@ namespace detail {
 			assert(!id_.empty());
 		}
 
-		~video_receiver() {
+		~video_receiver() override {
 
-			//auto r = ShowWindow(hwnd_, SW_HIDE);
-			//assert(r != 0);//it shows it was previously shown
 			const auto m = grt::make_render_wnd_close_req(id_);
-		//	auto sender = sender_;
-			sender_->send_to_renderer(id_, m, [](auto type, auto msg) {});
-				//[sender = this->sender_, id = this->id_](auto type, auto msg) { sender->done(id); });
+		
+			std::promise<void> trigger;
+			auto future = trigger.get_future();
+			sender_->send_to_renderer(id_, m, [&trigger](auto type, auto msg) mutable {
+				trigger.set_value();
+			});
 
+			const auto status = future.wait_for(std::chrono::seconds(5));//wait for message to deliever.
+			assert(status == std::future_status::ready);//todo: log status.
+			sender_->done(id_);
 		}
 
 		void on_frame(grt::yuv_frame frame) override {
