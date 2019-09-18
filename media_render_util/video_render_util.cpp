@@ -55,6 +55,14 @@ namespace detail {
 		get_frame_receiver(HWND hwnd, std::unique_ptr< grt::renderer>&& render, std::string id, std::shared_ptr<grt::sender> sender) {
 		return std::make_unique< video_receiver>(hwnd, std::move(render), id, sender);
 	}
+
+	void _show_rendering_wnd(std::shared_ptr<grt::sender> sender, bool to_show) {
+		assert(sender);
+		const auto m = grt::make_show_hide_msg(to_show);
+		sender->send_to_renderer("show_hide", m, [](auto, auto) {});
+		sender->done("show_hide");
+		std::this_thread::sleep_for(std::chrono::seconds(2));//wait for message for sent. todo: fix this dependency in sender itself.
+	}
 }
 
 namespace util {
@@ -113,6 +121,13 @@ namespace util {
 			assert(type == grt::message_type::wnd_close_req_res);
 			sender->done(id); 
 		});
+	}
+
+	void show_rendering_window(std::shared_ptr<grt::sender> sender) {
+		detail::_show_rendering_wnd(sender, true);
+	}
+	void hide_rendering_window(std::shared_ptr<grt::sender> sender) {
+		detail::_show_rendering_wnd(sender, false);
 	}
 
 	
