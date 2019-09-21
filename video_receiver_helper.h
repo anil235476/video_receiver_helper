@@ -2,14 +2,16 @@
 #define _VIDEO_RECEIVER_HELPER_H___
 #include <memory>
 #include <string>
+#include "video_receiver/video_track_receiver.h"
+#include "rendering_server_client/rendering_server_client.h"
 
 namespace webrtc {
 	class MediaStreamTrackInterface;
 }
 
 namespace grt {
-	class video_track_receiver;
-	class sender;
+	//class video_track_receiver;
+	//class sender;
 
 	std::unique_ptr< video_track_receiver> 
 		set_video_renderer(webrtc::MediaStreamTrackInterface*, grt::sender* sender, std::string const& id);
