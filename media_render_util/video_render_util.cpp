@@ -14,10 +14,10 @@ namespace detail {
 		std::shared_ptr<grt::renderer> renderer_;
 		HWND hwnd_;
 		const std::string id_;
-		grt::sender* sender_{ nullptr };
+		std::shared_ptr<grt::sender> sender_;
 
 	public:
-		video_receiver(HWND hwnd, std::unique_ptr< grt::renderer>&& render, std::string id, grt::sender* sender)
+		video_receiver(HWND hwnd, std::unique_ptr< grt::renderer>&& render, std::string id, std::shared_ptr<grt::sender> sender)
 			:renderer_{ std::move(render) }, hwnd_{ hwnd }, id_{ id }, sender_{ sender }{
 			auto r = SetWindowPos(hwnd_, HWND_TOPMOST,
 				0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE);
@@ -26,15 +26,21 @@ namespace detail {
 			assert(!id_.empty());
 		}
 
-		~video_receiver() {
+		~video_receiver() override {
 
-			//auto r = ShowWindow(hwnd_, SW_HIDE);
-			//assert(r != 0);//it shows it was previously shown
 			const auto m = grt::make_render_wnd_close_req(id_);
-		//	auto sender = sender_;
-			sender_->send_to_renderer(id_, m, [sender = this->sender_, id = this->id_](auto type, auto msg) { sender->done(id); });
+		
+			std::promise<void> trigger;
+			auto future = trigger.get_future();
+			sender_->send_to_renderer(id_, m, [&trigger](auto type, auto msg) mutable {
+				trigger.set_value();
+			});
 
+			const auto status = future.wait_for(std::chrono::seconds(5));//wait for message to deliever.
+			assert(status == std::future_status::ready);//todo: log status.
+			sender_->done(id_);
 		}
+
 		void on_frame(grt::yuv_frame frame) override {
 			auto frame_info = grt::make_frame_info(
 				frame.y_, frame.u_, frame.v_, frame.stride_y_,
@@ -46,8 +52,16 @@ namespace detail {
 
 
 	std::unique_ptr< grt::video_frame_callback>
-		get_frame_receiver(HWND hwnd, std::unique_ptr< grt::renderer>&& render, std::string id, grt::sender* sender) {
+		get_frame_receiver(HWND hwnd, std::unique_ptr< grt::renderer>&& render, std::string id, std::shared_ptr<grt::sender> sender) {
 		return std::make_unique< video_receiver>(hwnd, std::move(render), id, sender);
+	}
+
+	void _show_rendering_wnd(std::shared_ptr<grt::sender> sender, bool to_show) {
+		assert(sender);
+		const auto m = grt::make_show_hide_msg(to_show);
+		sender->send_to_renderer("show_hide", m, [](auto, auto) {});
+		sender->done("show_hide");
+		std::this_thread::sleep_for(std::chrono::seconds(2));//wait for message for sent. todo: fix this dependency in sender itself.
 	}
 }
 
@@ -73,7 +87,7 @@ namespace util {
 	}
 
 	bool set_video_renderer(grt::video_track_receiver* receiver, std::string class_name, 
-		std::string parent_name, std::string  renderer_id, grt::sender* sender, std::string id) {
+		std::string parent_name, std::string  renderer_id, std::shared_ptr<grt::sender> sender, std::string id) {
 		//todo: create connection with display manager and ask for creating a window.
 		assert(receiver);
 
@@ -86,7 +100,7 @@ namespace util {
 		return true;
 	}
 
-	void async_set_video_renderer(grt::video_track_receiver* recevier, grt::sender* sender, std::string const& id) {
+	void async_set_video_renderer(grt::video_track_receiver* recevier, std::shared_ptr<grt::sender> sender, std::string const& id) {
 		const auto m = grt::make_render_wnd_req(id);
 		sender->send_to_renderer(id, m, [recevier, sender, id](grt::message_type type, absl::any msg) {
 			assert(type == grt::message_type::window_create_res);
@@ -101,12 +115,19 @@ namespace util {
 		});
 	}
 
-	void async_reset_video_renderer(grt::sender* sender, std::string const& id) {
+	void async_reset_video_renderer(std::shared_ptr<grt::sender> sender, std::string const& id) {
 		const auto m = grt::make_render_wnd_close_req(id);
 		sender->send_to_renderer(id, m, [id, sender](auto type, auto msg) {
 			assert(type == grt::message_type::wnd_close_req_res);
-			sender->done(id);
+			sender->done(id); 
 		});
+	}
+
+	void show_rendering_window(std::shared_ptr<grt::sender> sender) {
+		detail::_show_rendering_wnd(sender, true);
+	}
+	void hide_rendering_window(std::shared_ptr<grt::sender> sender) {
+		detail::_show_rendering_wnd(sender, false);
 	}
 
 	

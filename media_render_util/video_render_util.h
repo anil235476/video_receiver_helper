@@ -7,8 +7,10 @@ namespace grt {
 	class video_track_receiver;
 }
 namespace util {
-	void async_set_video_renderer(grt::video_track_receiver*, grt::sender* sender, std::string const& id);
-	void async_reset_video_renderer(grt::sender* sender, std::string const& id);
+	void async_set_video_renderer(grt::video_track_receiver*, std::shared_ptr<grt::sender> sender, std::string const& id);
+	void async_reset_video_renderer(std::shared_ptr<grt::sender> sender, std::string const& id);
+	void show_rendering_window(std::shared_ptr<grt::sender> sender);
+	void hide_rendering_window(std::shared_ptr<grt::sender> sender);
 }
 
 
