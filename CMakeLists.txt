@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.7)
 
 #set(BOOST_LIB "D:/boost_1_69_0/boost_1_69_0")
 
+if(STAND_ALONE_BUILD)
+set(SIGNALLER_LIB_PATH "D:/git_project/")
+set(JSON_INCLUDE "D:/git_project/json_parser/include")
+set(JSON_LIB_PATH "D:/git_project/json_parser/")
+endif(STAND_ALONE_BUILD)
+
 set(LIBWEBRTC_INCLUDE_PATH "D:/webrtcBuild/Sept/webrtc_checkout/src")
 set(ABSL_PATH "${LIBWEBRTC_INCLUDE_PATH}/third_party/abseil-cpp")
 
@@ -22,6 +28,9 @@ add_library(video_receiver_helper
 target_include_directories(video_receiver_helper PUBLIC 
 	$<BUILD_INTERFACE:${ABSL_PATH}>
 	$<BUILD_INTERFACE:${LIBWEBRTC_INCLUDE_PATH}>
+	$<BUILD_INTERFACE:${SIGNALLER_LIB_PATH}>
+	$<BUILD_INTERFACE:${JSON_INCLUDE}>
+	$<BUILD_INTERFACE:${JSON_LIB_PATH}>
 	)
 
 add_subdirectory(media_render_util)
