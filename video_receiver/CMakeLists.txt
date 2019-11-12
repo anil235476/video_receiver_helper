@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.7)
 
 
+add_definitions(/ZI)
+
 add_library(video_receiver
 	video_track_receiver_impl.h
 	video_track_receiver_impl.cpp

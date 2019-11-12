@@ -4,6 +4,9 @@
 #include "api/media_stream_interface.h"
 #include "rendering_server_client/rendering_server_client.h"
 #include "video_receiver/video_track_receiver.h"
+#include <map>
+#include <mutex>
+
 namespace grt {
 
 	class video_receiver {
@@ -15,7 +18,8 @@ namespace grt {
 		void remove_track(std::string id, rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track);
 	private:
 		std::shared_ptr<sender> sender_;
-		std::unique_ptr< video_track_receiver> video_track_receiver_;
+		std::map<std::string, std::unique_ptr< video_track_receiver> >track_table_;
+		std::mutex table_lck_;
 	};
 }
 
