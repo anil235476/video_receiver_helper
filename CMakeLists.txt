@@ -23,6 +23,8 @@ endif()
 add_library(video_receiver_helper
    video_receiver_helper.h 
    video_receiver_helper.cpp
+   media_receiver.h
+   media_receiver.cpp
 )
 
 target_include_directories(video_receiver_helper PUBLIC 
