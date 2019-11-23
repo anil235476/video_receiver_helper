@@ -23,3 +23,6 @@ target_include_directories(media_render_util PUBLIC
 #	"./../../websocket_client/"
 #	"./../../json_parser"
 	)
+
+	target_link_libraries(media_render_util PUBLIC 
+	    json_parser)

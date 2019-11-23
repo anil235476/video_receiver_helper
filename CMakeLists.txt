@@ -35,6 +35,9 @@ target_include_directories(video_receiver_helper PUBLIC
 	$<BUILD_INTERFACE:${JSON_LIB_PATH}>
 	)
 
+target_link_libraries(video_receiver_helper PUBLIC 
+   json_parser)
+
 add_subdirectory(media_render_util)
 add_subdirectory(rendering_server_client)
 add_subdirectory(video_receiver)
