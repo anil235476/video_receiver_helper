@@ -15,14 +15,9 @@ add_library(media_render_util
 	video_render_util.cpp
 	)
 
-target_include_directories(media_render_util PUBLIC 
-	$<BUILD_INTERFACE:${ABSL_PATH}>
-	"./../."
-	"./../../"
-	"./../../json_parser/include/"
-#	"./../../websocket_client/"
-#	"./../../json_parser"
-	)
-
-	target_link_libraries(media_render_util PUBLIC 
-	    json_parser)
+target_link_libraries(media_render_util PRIVATE 
+	    json_parser
+		video_render
+		video_receiver
+		rendering_server_client
+		)

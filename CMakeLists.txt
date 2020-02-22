@@ -8,9 +8,6 @@ set(JSON_INCLUDE "D:/git_project/json_parser/include")
 set(JSON_LIB_PATH "D:/git_project/json_parser/")
 endif(STAND_ALONE_BUILD)
 
-#set(LIBWEBRTC_INCLUDE_PATH "D:/webrtcBuild/Sept/webrtc_checkout/src")
-#set(ABSL_PATH "${LIBWEBRTC_INCLUDE_PATH}/third_party/abseil-cpp")
-
 
 ADD_DEFINITIONS(-D_UNICODE)
 add_definitions(/ZI)
@@ -28,6 +25,8 @@ add_library(video_receiver_helper
 )
 
 target_include_directories(video_receiver_helper PUBLIC 
+$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+PRIVATE
 	$<BUILD_INTERFACE:${ABSL_PATH}>
 	$<BUILD_INTERFACE:${LIBWEBRTC_INCLUDE_PATH}>
 	$<BUILD_INTERFACE:${SIGNALLER_LIB_PATH}>

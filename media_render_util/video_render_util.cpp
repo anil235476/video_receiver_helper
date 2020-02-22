@@ -1,10 +1,10 @@
 #include "video_render_util.h"
 #include <cassert>
-#include "video_render/renderer.h"
+#include "renderer.h"
 #include <thread>
-#include "json_parser/json_parser.h"
-#include "rendering_server_client/rendering_server_client.h"
-#include "video_receiver/video_track_receiver.h"
+#include "json_parser.h"
+#include "rendering_server_client.h"
+#include "video_track_receiver.h"
 #include <Windows.h>
 
 namespace detail {

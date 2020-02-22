@@ -23,6 +23,8 @@ if(MSVC)
 endif()
 
 target_include_directories(video_receiver PUBLIC 
+			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+   PRIVATE
 	#$<BUILD_INTERFACE:${BOOST_LIB}>
 	$<BUILD_INTERFACE:${ABSL_PATH}>
 #	$<BUILD_INTERFACE:${CMAKE_HOME_DIRECTORY}/lib/>
