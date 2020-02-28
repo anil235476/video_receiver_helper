@@ -32,7 +32,7 @@ namespace detail {
 		
 			std::promise<void> trigger;
 			auto future = trigger.get_future();
-			sender_->send_to_renderer(id_, m, [&trigger](auto type, auto msg) mutable {
+			sender_->send_to_renderer(id_, m, [&trigger](auto type, auto msg, auto) mutable {
 				trigger.set_value();
 			});
 
@@ -59,7 +59,7 @@ namespace detail {
 	void _show_rendering_wnd(std::shared_ptr<grt::sender> sender, bool to_show) {
 		assert(sender);
 		const auto m = grt::make_show_hide_msg(to_show);
-		sender->send_to_renderer("show_hide", m, [](auto, auto) {});
+		sender->send_to_renderer("show_hide", m, [](auto, auto, auto) {});
 		sender->done("show_hide");
 		std::this_thread::sleep_for(std::chrono::seconds(2));//wait for message for sent. todo: fix this dependency in sender itself.
 	}
@@ -102,7 +102,7 @@ namespace util {
 
 	void async_set_video_renderer(grt::video_track_receiver* recevier, std::shared_ptr<grt::sender> sender, std::string const& id) {
 		const auto m = grt::make_render_wnd_req(id);
-		sender->send_to_renderer(id, m, [recevier, sender, id](grt::message_type type, absl::any msg) {
+		sender->send_to_renderer(id, m, [recevier, sender, id](grt::message_type type, absl::any msg, auto) {
 			assert(type == grt::message_type::window_create_res);
 			auto wndInfo = absl::any_cast<grt::wnd_create_res>(msg);
 			assert(wndInfo.status_);
@@ -117,7 +117,7 @@ namespace util {
 
 	void async_reset_video_renderer(std::shared_ptr<grt::sender> sender, std::string const& id) {
 		const auto m = grt::make_render_wnd_close_req(id);
-		sender->send_to_renderer(id, m, [id, sender](auto type, auto msg) {
+		sender->send_to_renderer(id, m, [id, sender](auto type, auto msg, auto) {
 			assert(type == grt::message_type::wnd_close_req_res);
 			sender->done(id); 
 		});
