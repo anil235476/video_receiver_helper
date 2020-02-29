@@ -12,6 +12,10 @@ endif(STAND_ALONE_BUILD)
 ADD_DEFINITIONS(-D_UNICODE)
 add_definitions(/ZI)
 
+add_subdirectory(media_render_util)
+add_subdirectory(rendering_server_client)
+add_subdirectory(video_receiver)
+
 if(MSVC)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
@@ -26,17 +30,17 @@ add_library(video_receiver_helper
 
 target_include_directories(video_receiver_helper PUBLIC 
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+$<BUILD_INTERFACE:${LIBWEBRTC_INCLUDE_PATH}>
 PRIVATE
-	$<BUILD_INTERFACE:${ABSL_PATH}>
-	$<BUILD_INTERFACE:${LIBWEBRTC_INCLUDE_PATH}>
-	$<BUILD_INTERFACE:${SIGNALLER_LIB_PATH}>
-	$<BUILD_INTERFACE:${JSON_INCLUDE}>
-	$<BUILD_INTERFACE:${JSON_LIB_PATH}>
 	)
 
-target_link_libraries(video_receiver_helper PUBLIC 
-   json_parser)
+target_link_libraries(video_receiver_helper 
 
-add_subdirectory(media_render_util)
-add_subdirectory(rendering_server_client)
-add_subdirectory(video_receiver)
+PUBLIC 
+
+   rendering_server_client
+  
+PRIVATE
+    video_receiver
+   media_render_util
+   )
