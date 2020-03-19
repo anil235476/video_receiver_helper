@@ -9,7 +9,7 @@ namespace grt {
 
 	void video_receiver::start( function_callback callback) {
 		assert(sender_.get() == nullptr);
-		sender_ = std::make_shared<sender>();
+		sender_ = get_rendering_server_client();// std::make_shared<sender>();
 
 		auto future_ = sender_->sync_connect(RENDERING_SERVER_IP, RENDERING_SERVER_PORT);
 		const auto connection_status = future_.get();
