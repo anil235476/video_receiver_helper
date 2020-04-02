@@ -48,6 +48,7 @@ namespace grt {
 		sender_->register_for_message(mic_toggle_id, callback);
 		sender_->register_for_message(cam_toggle_id, callback);
 		sender_->register_for_message(error_id, callback);
+		sender_->register_for_message(share_toggle_id, callback);
 		return sender_;
 	}
 
