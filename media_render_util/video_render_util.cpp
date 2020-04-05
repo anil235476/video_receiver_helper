@@ -2,7 +2,6 @@
 #include <cassert>
 #include "renderer.h"
 #include <thread>
-#include "json_parser.h"
 #include "rendering_server_client.h"
 #include "video_track_receiver.h"
 #include <Windows.h>
@@ -100,9 +99,9 @@ namespace util {
 		return true;
 	}
 
-	void async_set_video_renderer(grt::video_track_receiver* recevier, std::shared_ptr<grt::sender> sender, std::string const& id) {
-		const auto m = grt::make_render_wnd_req(id);
-		sender->send_to_renderer(id, m, [recevier, sender, id](grt::message_type type, absl::any msg, auto) {
+	void async_set_video_renderer(grt::video_track_receiver* recevier, std::shared_ptr<grt::sender> sender, grt::window_info info) {
+		const auto m = grt::make_render_wnd_req(info);
+		sender->send_to_renderer(info.id_, m, [recevier, sender, id= info.id_](grt::message_type type, absl::any msg, auto) {
 			assert(type == grt::message_type::window_create_res);
 			auto wndInfo = absl::any_cast<grt::wnd_create_res>(msg);
 			assert(wndInfo.status_);

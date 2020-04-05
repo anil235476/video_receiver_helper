@@ -13,7 +13,7 @@ namespace grt {
 	public:
 		~video_receiver();
 		void set_sender(std::shared_ptr<sender> sender);
-		void receive_track(std::string id, rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track);
+		void receive_track(window_info info, rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track);
 		void remove_track(std::string id, rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track);
 	private:
 		std::shared_ptr<sender> sender_;

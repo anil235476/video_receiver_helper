@@ -13,18 +13,18 @@ namespace grt {
 	video_receiver::~video_receiver() = default;
 
 	
-	void video_receiver::receive_track(std::string id, rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track) {
+	void video_receiver::receive_track(window_info info, rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track) {
 		assert(track.get() != nullptr);
 		assert(track->kind() == webrtc::MediaStreamTrackInterface::kVideoKind);
 		//assert(video_track_receiver_.get() == nullptr);
 		assert(sender_.get() != nullptr);
-		assert(track_table_.find(id) == track_table_.end());
+		assert(track_table_.find(info.id_) == track_table_.end());
 		auto receiver = set_video_renderer(
 			static_cast<webrtc::VideoTrackInterface*>(track.release()),
-			sender_, id);
+			sender_, info);
 		{
 			lock lck{ table_lck_ };
-			track_table_.emplace(id, std::move(receiver));
+			track_table_.emplace(info.id_, std::move(receiver));
 		}
 		
 								
