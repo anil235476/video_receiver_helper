@@ -36,6 +36,11 @@ namespace grt {
 		track_table_.erase(id);
 	}
 
+	void  video_receiver::update_window_info(window_info info) {
+		const auto m = make_window_info_update_msg(info);
+		sender_->send_to_renderer("update_wnd_info", m, grt::function_callback{});
+		sender_->done("update_wnd_info");
+	}
 
 	std::shared_ptr<sender> get_rendering_wnd_sender(function_callback callback) {
 		auto sender_ = get_rendering_server_client();// std::make_shared<sender>();
