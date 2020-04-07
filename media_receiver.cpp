@@ -32,7 +32,7 @@ namespace grt {
 
 	void  video_receiver::remove_track(std::string id, rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track) {
 		assert(track_table_.find(id) != track_table_.end());
-		async_reset_video_renderer(sender_, id);
+		reset_video_renderer(sender_, id);
 		lock lck{ table_lck_ };
 		track_table_.erase(id);
 	}

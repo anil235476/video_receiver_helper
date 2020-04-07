@@ -16,4 +16,9 @@ namespace grt {
 		util::async_reset_video_renderer(sender, id);
 	}
 
+
+	void reset_video_renderer(std::shared_ptr<grt::sender> sender, std::string const& id) {
+		util::reset_video_renderer(sender, id);
+	}
+
 }//namespace grt
