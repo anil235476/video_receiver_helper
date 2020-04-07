@@ -26,18 +26,19 @@ namespace detail {
 		}
 
 		~video_receiver() override {
-
-			const auto m = grt::make_render_wnd_close_req(id_);
+			//todo: this is wrong design.
+			//should be improved
+			//const auto m = grt::make_render_wnd_close_req(id_);
 		
-			std::promise<void> trigger;
-			auto future = trigger.get_future();
-			sender_->send_to_renderer(id_, m, [&trigger](auto type, auto msg, auto) mutable {
-				trigger.set_value();
-			});
+			//std::promise<void> trigger;
+			//auto future = trigger.get_future();
+			//sender_->send_to_renderer(id_, m, [&trigger](auto type, auto msg, auto) mutable {
+			//	trigger.set_value();
+			//});
 
-			const auto status = future.wait_for(std::chrono::seconds(5));//wait for message to deliever.
-			assert(status == std::future_status::ready);//todo: log status.
-			sender_->done(id_);
+			//const auto status = future.wait_for(std::chrono::seconds(5));//wait for message to deliever.
+			//assert(status == std::future_status::ready);//todo: log status.
+			//sender_->done(id_);
 		}
 
 		void on_frame(grt::yuv_frame frame) override {
