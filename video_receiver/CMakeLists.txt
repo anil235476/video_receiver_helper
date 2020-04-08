@@ -22,6 +22,9 @@ if(MSVC)
 )
 endif()
 
+target_link_libraries(video_receiver PRIVATE 
+video_receiver_helper)
+
 target_include_directories(video_receiver PUBLIC 
 			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    PRIVATE

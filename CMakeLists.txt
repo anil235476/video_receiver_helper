@@ -26,6 +26,8 @@ add_library(video_receiver_helper
    video_receiver_helper.cpp
    media_receiver.h
    media_receiver.cpp
+   custom_video_buffer.h
+   custom_video_buffer.cpp
 )
 
 target_include_directories(video_receiver_helper PUBLIC 
