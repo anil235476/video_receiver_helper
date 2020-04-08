@@ -48,6 +48,12 @@ namespace detail {
 			renderer_->render_frame(hwnd_, frame_info);
 			grt::clean(frame_info);
 		}
+
+		void on_frame(grt::rgba_frame frame) override {
+			auto frame_info = grt::make_frame_info(frame.data_.data(), frame.w_, frame.h_, frame.data_.size(), grt::frame_type::RGB);
+			renderer_->render_frame(hwnd_, frame_info);
+			grt::clean(frame_info);
+		}
 	};
 
 

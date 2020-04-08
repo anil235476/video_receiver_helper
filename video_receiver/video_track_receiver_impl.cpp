@@ -1,5 +1,5 @@
 #include "video_track_receiver_impl.h"
-
+#include "custom_video_buffer.h"
 
 namespace util {
 	grt::yuv_frame convert_to_yuv_frame(const webrtc::VideoFrame& frame) {
@@ -14,6 +14,11 @@ namespace util {
 		const auto strideu = yuv->StrideU();
 		const auto stridev = yuv->StrideV();
 		return grt::yuv_frame{ y, u, v, stridey, strideu, stridev, width, height };
+	}
+
+	grt::rgba_frame convert_to_rgba_frame(const webrtc::VideoFrame& frame) {
+		auto const& data = grt::get_underlaying_rgb_buffer(frame.video_frame_buffer());
+		return grt::rgba_frame{ data, frame.width(), frame.height() };
 	}
 }
 
@@ -35,7 +40,12 @@ namespace grt {
 
 	void video_track_receiver_impl::OnFrame(const webrtc::VideoFrame& frame) {
 		if (callback_) {
-			callback_->on_frame(util::convert_to_yuv_frame(frame));
+			rtc::scoped_refptr<webrtc::VideoFrameBuffer> bufer = frame.video_frame_buffer();
+			if (bufer->type() == webrtc::VideoFrameBuffer::Type::kNative) {
+				callback_->on_frame(util::convert_to_rgba_frame(frame));
+			}
+			else
+					callback_->on_frame(util::convert_to_yuv_frame(frame));
 		}
 			
 	}

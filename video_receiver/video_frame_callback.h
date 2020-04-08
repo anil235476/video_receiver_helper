@@ -1,6 +1,7 @@
 #ifndef _VIDEO_FRAME_CALLBACK_H__
 #define _VIDEO_FRAME_CALLBACK_H__
 #include <cstdint>
+#include <vector>
 
 namespace grt {
 	struct yuv_frame {
@@ -19,10 +20,18 @@ namespace grt {
 		const int h_;
 	};
 
+	struct rgba_frame {
+		const std::vector<char> data_;
+		const int w_;
+		const int h_;
+		rgba_frame(std::vector<char> data, int w, int h):data_{data},w_{w},h_{h}{}
+	};
+
 	class video_frame_callback {
 	public:
 		virtual ~video_frame_callback() {}
 		virtual void on_frame(yuv_frame) = 0;
+		virtual void on_frame(rgba_frame) = 0;
 	};
 } //namespace grt
 
