@@ -1,5 +1,5 @@
 #include "video_track_receiver_impl.h"
-
+#include "third_party/libyuv/include/libyuv.h"
 
 namespace util {
 	grt::yuv_frame convert_to_yuv_frame(const webrtc::VideoFrame& frame) {
@@ -14,6 +14,23 @@ namespace util {
 		const auto strideu = yuv->StrideU();
 		const auto stridev = yuv->StrideV();
 		return grt::yuv_frame{ y, u, v, stridey, strideu, stridev, width, height };
+	}
+
+	grt::rgb_frame convert_to_rgb_frame(const webrtc::VideoFrame& frame) {
+		const auto width = frame.width();
+		const auto height = frame.height();
+		int stride = width;//todo: we need to work on this. for some resolution it does not work
+		/*if (width % 2) {
+			stride++;
+		}*/
+		rtc::scoped_refptr<webrtc::I420BufferInterface> yuv = frame.video_frame_buffer()->GetI420();
+		std::vector<uint8_t> data(width*height * 4, 0);
+		assert(data.size() == width * height * 4);
+		const auto r = libyuv::I420ToARGB(yuv->DataY(), yuv->StrideY(), yuv->DataU(), yuv->StrideU(),
+			yuv->DataV(), yuv->StrideV(), &data[0], stride *4, width, height);
+		assert(r == 0);
+		return grt::rgb_frame{ data , width, height };
+		
 	}
 }
 
@@ -35,7 +52,7 @@ namespace grt {
 
 	void video_track_receiver_impl::OnFrame(const webrtc::VideoFrame& frame) {
 		if (callback_) {
-			callback_->on_frame(util::convert_to_yuv_frame(frame));
+			callback_->on_frame(util::convert_to_rgb_frame(frame));
 		}
 			
 	}
