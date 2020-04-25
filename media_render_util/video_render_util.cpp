@@ -93,7 +93,8 @@ namespace util {
 	}
 
 	bool set_video_renderer(grt::video_track_receiver* receiver, std::string class_name, 
-		std::string parent_name, std::string  renderer_id, std::shared_ptr<grt::sender> sender, std::string id) {
+		std::string parent_name, std::string  renderer_id, std::shared_ptr<grt::sender> sender, std::string id
+	,std::string usr_name) {
 		//todo: create connection with display manager and ask for creating a window.
 		assert(receiver);
 
@@ -101,14 +102,16 @@ namespace util {
 		
 		assert(hwnd);//rendering application with window should be running
 		if (hwnd == nullptr) return false;
-		auto frame_receiver = detail::get_frame_receiver(hwnd, grt::get_renderer(), id, sender);
+		auto renderer = grt::get_renderer();
+		renderer->render_name(hwnd, usr_name);
+		auto frame_receiver = detail::get_frame_receiver(hwnd, std::move(renderer), id, sender);
 		receiver->register_callback(std::move(frame_receiver));
 		return true;
 	}
 
 	void async_set_video_renderer(grt::video_track_receiver* recevier, std::shared_ptr<grt::sender> sender, grt::window_info info) {
 		const auto m = grt::make_render_wnd_req(info);
-		sender->send_to_renderer(info.id_, m, [recevier, sender, id= info.id_](grt::message_type type, absl::any msg, auto) {
+		sender->send_to_renderer(info.id_, m, [recevier, sender, info](grt::message_type type, absl::any msg, auto) {
 			assert(type == grt::message_type::window_create_res);
 			auto wndInfo = absl::any_cast<grt::wnd_create_res>(msg);
 			assert(wndInfo.status_);
@@ -116,8 +119,8 @@ namespace util {
 			const auto wndName = wndInfo.parent_wnd_name_;
 			const auto wndId = wndInfo.child_wnd_id_;
 		
-			set_video_renderer(recevier, className, wndName, wndId, sender, id);
-			sender->done(id);
+			set_video_renderer(recevier, className, wndName, wndId, sender, info.id_, info.name_);
+			sender->done(info.id_);
 		});
 	}
 
