@@ -61,14 +61,6 @@ namespace detail {
 		get_frame_receiver(HWND hwnd, std::unique_ptr< grt::renderer>&& render, std::string id, std::shared_ptr<grt::sender> sender) {
 		return std::make_unique< video_receiver>(hwnd, std::move(render), id, sender);
 	}
-
-	void _show_rendering_wnd(std::shared_ptr<grt::sender> sender, bool to_show) {
-		assert(sender);
-		const auto m = grt::make_show_hide_msg(to_show);
-		sender->send_to_renderer("show_hide", m, [](auto, auto, auto) {});
-		sender->done("show_hide");
-		std::this_thread::sleep_for(std::chrono::seconds(2));//wait for message for sent. todo: fix this dependency in sender itself.
-	}
 }
 
 namespace util {
@@ -146,11 +138,27 @@ namespace util {
 		});
 	}
 
-	void show_rendering_window(std::shared_ptr<grt::sender> sender) {
-		detail::_show_rendering_wnd(sender, true);
+
+	void show_conference_layout(std::shared_ptr<grt::sender> sender) noexcept {
+		assert(sender);
+		const auto m = grt::make_conference_view_layout();
+		sender->send_to_renderer("confrence_view", m, [](auto, auto, auto) {});
+		sender->done("confrence_view");
+		std::this_thread::sleep_for(std::chrono::seconds(2));//wait for message for sent. todo: fix this dependency in sender itself.
 	}
-	void hide_rendering_window(std::shared_ptr<grt::sender> sender) {
-		detail::_show_rendering_wnd(sender, false);
+	void show_self_view_layout(std::shared_ptr<grt::sender> sender) noexcept {
+		assert(sender);
+		const auto m = grt::make_self_view_layout();
+		sender->send_to_renderer("selfview_layout", m, [](auto, auto, auto) {});
+		sender->done("selfview_layout");
+		std::this_thread::sleep_for(std::chrono::seconds(2));//wait for message for sent. todo: fix this dependency
+	}
+	void show_ui_layout(std::shared_ptr<grt::sender> sender) noexcept {
+		assert(sender);
+		const auto m = grt::make_ui_view_layout();
+		sender->send_to_renderer("ui_view_layout", m, [](auto, auto, auto) {});
+		sender->done("ui_view_layout");
+		std::this_thread::sleep_for(std::chrono::seconds(2));//wait for message for sent. todo: fix this dependency
 	}
 
 	
