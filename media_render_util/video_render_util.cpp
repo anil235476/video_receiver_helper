@@ -65,14 +65,49 @@ namespace detail {
 
 namespace util {
 
+
+	struct result {
+		const std::wstring name_;
+		HWND wnd = nullptr;
+		result(const wchar_t* child_wnd_name) :name_{ child_wnd_name } {
+
+		}
+	};
+
+	BOOL CALLBACK EnumChildProc(
+		_In_ HWND   hwnd,
+		_In_ LPARAM lParam
+	) {
+		result* ptr = reinterpret_cast<result*>(lParam);
+		assert(ptr);
+		wchar_t buffer[100];
+		const auto l = GetWindowText(hwnd, buffer, sizeof(buffer));
+		if (l > 0) {
+			if (ptr->name_ == std::wstring{ buffer, size_t(l) }) {
+				ptr->wnd = hwnd;
+				return false;
+			}
+		}
+		return true;
+	}
+
 	HWND find_child_window(const wchar_t* className, const wchar_t* parent_wnd_name,
 		const wchar_t* child_wnd_name) {
+
 		auto parentWnd = FindWindow(className, parent_wnd_name);
 		assert(parentWnd);
-		if (parentWnd == nullptr) return nullptr;
-		auto wnd = FindWindowEx(parentWnd, nullptr, className, child_wnd_name);
-		assert(wnd);
-		return wnd;
+		result ret{ child_wnd_name };
+		EnumChildWindows(parentWnd, EnumChildProc, (LPARAM)&ret);
+		assert(ret.wnd);
+		return ret.wnd;
+
+		////auto parentWnd = FindWindow(className, parent_wnd_name);
+		//auto parentWnd = FindWindowEx(grandparent, nullptr, className, parent_wnd_name);
+		//assert(parentWnd);
+		//if (parentWnd == nullptr) return nullptr;
+		//auto wnd = FindWindowEx(parentWnd, nullptr, className, child_wnd_name);
+		//assert(wnd);
+		//return wnd;
 	}
 
 	std::wstring to_wstring(std::string v) {
