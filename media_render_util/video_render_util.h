@@ -11,9 +11,12 @@ namespace util {
 	void async_set_video_renderer(grt::video_track_receiver*, std::shared_ptr<grt::sender> sender, grt::window_info info);
 	void async_reset_video_renderer(std::shared_ptr<grt::sender> sender, std::string const& id);
 	void reset_video_renderer(std::shared_ptr<grt::sender> sender, std::string const& id);
+#if 0
 	void show_conference_layout(std::shared_ptr<grt::sender> sender) noexcept;
 	void show_self_view_layout(std::shared_ptr<grt::sender> sender) noexcept;
 	void show_ui_layout(std::shared_ptr<grt::sender> sender) noexcept;
+#endif
+	void send_message_to_renderer(grt::message_type type, std::shared_ptr<grt::sender> sender) noexcept;
 }
 
 
