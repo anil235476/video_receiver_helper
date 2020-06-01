@@ -197,40 +197,9 @@ namespace util {
 	}
 #endif
 
-	void send_message_to_renderer(grt::message_type type,std::shared_ptr<grt::sender> sender) noexcept {
+	void send_message_to_renderer(std::shared_ptr<grt::sender> sender, std::string const& id , std::string const& msg) noexcept {
 		assert(sender);
-		std::string id = {};
-		std::string msg = {};
-
-		switch(type){
-
-		case grt::message_type::show_conference_layout:{
-			
-			msg = grt::make_conference_view_layout();
-			id = "confrence_view";
-		}
-		break;
-
-		case grt::message_type::show_self_view_layout:{
-			msg = grt::make_self_view_layout();
-			id = "selfview_layout";
-		}
-		break;
-
-		case grt::message_type::show_ui_layout:{
-			msg = grt::make_ui_view_layout();
-			id = "ui_view_layout";
-		}
-		break;
-
-		default:{
-			assert(false);
-			return;
-		}
 		
-			
-		}
-
 		sender->send_to_renderer(id, msg, [](auto, auto, auto) {});
 		sender->done(id);
 		std::this_thread::sleep_for(std::chrono::seconds(2));//wait for message for sent. todo: fix this dependency
