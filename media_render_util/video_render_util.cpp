@@ -197,13 +197,47 @@ namespace util {
 	}
 #endif
 
-	void send_message_to_renderer(std::shared_ptr<grt::sender> sender, std::string const& id , std::string const& msg) noexcept {
+	void post_message_to_renderer(grt::message_type type,std::shared_ptr<grt::sender> sender ) noexcept {
 		assert(sender);
 		
-		sender->send_to_renderer(id, msg, [](auto, auto, auto) {});
-		sender->done(id);
-		std::this_thread::sleep_for(std::chrono::seconds(2));//wait for message for sent. todo: fix this dependency
+		//todo : if required to send any argument we needs to handle here 
+		// It current design we don't need it now 
+		if(type == grt::message_type::show_conference_layout) {
+			const auto m = grt::make_conference_view_layout();
+			sender->post_to_renderer(m);
+		}
+		else if (type == grt::message_type::show_self_view_layout) {
+			const auto m = grt::make_self_view_layout();
+			sender->post_to_renderer(m);			
+		}
+		else if(type == grt::message_type::show_ui_layout) {
+			const auto m = grt::make_ui_view_layout();
+			sender->post_to_renderer(m);			
+		}
+		else {
+			assert(false);
+		}
+
+	}
+
+	void send_message_to_renderer(grt::message_type type, std::shared_ptr<grt::sender> sender ) noexcept {
 		
+		assert(sender);
+		post_message_to_renderer(type, sender);
+
+		//todo: we will add case as per the use case .
+		// this function send message to render and wait for render response 
+		// below is sample code that can be use for future use as reference type 
+#if 0
+		if (type == grt::message_type::show_conference_layout) {
+
+			const auto m = grt::make_conference_view_layout();
+			sender->send_to_renderer("confrence_view", m, [sender](auto type, auto, auto) {
+				assert(type == grt::message_type::msg_received_ack);
+				sender->done("confrence_view");				
+			});				
+		}
+#endif
 	}
 
 	
