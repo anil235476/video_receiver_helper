@@ -196,5 +196,32 @@ namespace util {
 		std::this_thread::sleep_for(std::chrono::seconds(2));//wait for message for sent. todo: fix this dependency
 	}
 
+	void send_forward_message(std::shared_ptr<grt::sender> sender, std::string const& msg) {
+		assert(sender);
+		sender->send_to_renderer("forward", msg, [](auto, auto, auto) {});
+		sender->done("forward");
+	}
+
+	void send_message(std::shared_ptr<grt::sender> sender,
+		grt::message_type type, absl::optional<absl::any> msg ) noexcept {
+		switch (type) {
+		case grt::message_type::show_self_view_layout:
+			show_self_view_layout(sender);
+			break;
+		case grt::message_type::show_conference_layout:
+			show_conference_layout(sender);
+			break;
+		case grt::message_type::show_ui_layout:
+			show_ui_layout(sender);
+			break;
+		case grt::message_type::forward_message:
+			assert(msg.has_value());
+			send_forward_message(sender, absl::any_cast<std::string>(msg.value()));
+			break;
+		default:
+			assert(false);
+		}
+	}
+
 	
 }//namespace util
