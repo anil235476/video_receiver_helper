@@ -177,29 +177,27 @@ namespace util {
 	void show_conference_layout(std::shared_ptr<grt::sender> sender) noexcept {
 		assert(sender);
 		const auto m = grt::make_conference_view_layout();
-		sender->send_to_renderer("confrence_view", m, [](auto, auto, auto) {});
-		sender->done("confrence_view");
-		std::this_thread::sleep_for(std::chrono::seconds(2));//wait for message for sent. todo: fix this dependency in sender itself.
+		sender->send_to_renderer("confrence_view", m, nullptr);		
 	}
 	void show_self_view_layout(std::shared_ptr<grt::sender> sender) noexcept {
 		assert(sender);
 		const auto m = grt::make_self_view_layout();
-		sender->send_to_renderer("selfview_layout", m, [](auto, auto, auto) {});
-		sender->done("selfview_layout");
-		std::this_thread::sleep_for(std::chrono::seconds(2));//wait for message for sent. todo: fix this dependency
+		sender->send_to_renderer("selfview_layout", m, nullptr);
 	}
 	void show_ui_layout(std::shared_ptr<grt::sender> sender) noexcept {
 		assert(sender);
 		const auto m = grt::make_ui_view_layout();
-		sender->send_to_renderer("ui_view_layout", m, [](auto, auto, auto) {});
-		sender->done("ui_view_layout");
-		std::this_thread::sleep_for(std::chrono::seconds(2));//wait for message for sent. todo: fix this dependency
+		sender->send_to_renderer("ui_view_layout", m, nullptr);		
 	}
 
 	void send_forward_message(std::shared_ptr<grt::sender> sender, std::string const& msg) {
-		assert(sender);
-		sender->send_to_renderer("forward", msg, [](auto, auto, auto) {});
-		sender->done("forward");
+		assert(sender);		
+		/*
+		* In the current design we don't have any use case for that we need response for forward msg, 
+		* Which sent to render.
+		* If required we need to Re-think this function again 
+		*/
+		sender->send_to_renderer("forward", msg, nullptr);
 	}
 
 	void send_message(std::shared_ptr<grt::sender> sender,
