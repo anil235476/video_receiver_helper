@@ -15,10 +15,10 @@ namespace detail {
 		HWND hwnd_;
 		const std::string id_;
 		std::shared_ptr<grt::sender> sender_;
-		std::shared_ptr<grt::recorder> recorder_;
+		grt::recorder recorder_;
 
 	public:
-		video_receiver(HWND hwnd, std::unique_ptr< grt::renderer>&& render, std::string id, std::shared_ptr<grt::sender> sender, std::unique_ptr< grt::recorder>&& recorder)
+		video_receiver(HWND hwnd, std::unique_ptr< grt::renderer>&& render, std::string id, std::shared_ptr<grt::sender> sender,  grt::recorder recorder)
 			:renderer_{ std::move(render) }, hwnd_{ hwnd }, id_{ id }, sender_{ sender }, recorder_{ std::move(recorder) }{
 			auto r = SetWindowPos(hwnd_, HWND_TOPMOST,
 				0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE);
@@ -53,16 +53,17 @@ namespace detail {
 
 		void on_frame(grt::rgb_frame frame) override {
 			auto frame_info = grt::make_frame_info(frame.data.data(), frame.w_, frame.h_);
-			auto recorder_frame_info = grt::recorder_make_frame_info(frame.data.data(), frame.w_, frame.h_);
+		//	auto recorder_frame_info = grt::recorder_make_frame_info(frame.data.data(), frame.w_, frame.h_);
 			renderer_->render_frame(hwnd_, frame_info);
-			recorder_->save_frame(recorder_frame_info);
+			recorder_.save_frame(frame_info);
 			grt::clean(frame_info);
 		}
 	};
 
 
 	std::unique_ptr< grt::video_frame_callback>
-		get_frame_receiver(HWND hwnd, std::unique_ptr< grt::renderer>&& render, std::string id, std::shared_ptr<grt::sender> sender, std::unique_ptr< grt::recorder>&& recorder) {
+		get_frame_receiver(HWND hwnd, std::unique_ptr< grt::renderer>&& render, std::string id, 
+			std::shared_ptr<grt::sender> sender, grt::recorder&& recorder) {
 		return std::make_unique< video_receiver>(hwnd, std::move(render), id, sender, std::move(recorder));
 	}
 }
@@ -135,9 +136,9 @@ namespace util {
 		if (hwnd == nullptr) return false;
 		auto renderer = grt::get_renderer();
 		renderer->render_name(hwnd, usr_name);
-		auto recorder = grt::get_recorder();
-		recorder->recorder_name(usr_name);
-		auto frame_receiver = detail::get_frame_receiver(hwnd, std::move(renderer), id, sender, std::move(recorder));
+		
+		auto frame_receiver = detail::get_frame_receiver(hwnd, std::move(renderer), id, sender, 
+			grt::recorder{ usr_name });
 		receiver->register_callback(std::move(frame_receiver));
 		return true;
 	}
