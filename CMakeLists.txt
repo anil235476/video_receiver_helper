@@ -12,6 +12,7 @@ endif(STAND_ALONE_BUILD)
 ADD_DEFINITIONS(-D_UNICODE)
 add_definitions(/ZI)
 
+#add_subdirectory(media_recorder_util)
 add_subdirectory(media_render_util)
 add_subdirectory(rendering_server_client)
 add_subdirectory(video_receiver)
@@ -43,4 +44,5 @@ PUBLIC
 PRIVATE
     video_receiver
    media_render_util
+   #media_recorder_util
    )

@@ -26,4 +26,5 @@ target_link_libraries(media_render_util PRIVATE
 		video_render
 		video_receiver
 		rendering_server_client
+		video_recorder
 		)

@@ -15,10 +15,18 @@ namespace grt {
 		async_reset_video_renderer(std::shared_ptr<grt::sender> sender, std::string const& id) {
 		util::async_reset_video_renderer(sender, id);
 	}
-
-
+	
 	void reset_video_renderer(std::shared_ptr<grt::sender> sender, std::string const& id) {
 		util::reset_video_renderer(sender, id);
 	}
 
+#if 0
+
+	std::unique_ptr< video_track_receiver>
+		set_video_recorder(webrtc::MediaStreamTrackInterface* stream, std::shared_ptr<grt::sender> sender, window_info info) {
+		auto track_receiver = get_receiver(stream);
+		util::async_set_video_renderer(track_receiver.get(), sender, info);
+		return track_receiver;
+	}
+#endif
 }//namespace grt
