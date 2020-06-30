@@ -7,6 +7,10 @@ namespace grt {
 	std::unique_ptr< video_track_receiver>
 		set_video_renderer(webrtc::MediaStreamTrackInterface* stream, std::shared_ptr<grt::sender> sender,window_info info) {
 		auto track_receiver = get_receiver(stream);
+		//narendra i think this function has to be replaced.
+		//i mean in case of recorder 
+		// we may like to call a function
+		//util::async_set_video_recorder
 		util::async_set_video_renderer(track_receiver.get(), sender, info);
 		return track_receiver;
 	}
@@ -20,7 +24,7 @@ namespace grt {
 		util::reset_video_renderer(sender, id);
 	}
 
-#if 0
+#if 0 //this function may not be required please see above comments.
 
 	std::unique_ptr< video_track_receiver>
 		set_video_recorder(webrtc::MediaStreamTrackInterface* stream, std::shared_ptr<grt::sender> sender, window_info info) {
