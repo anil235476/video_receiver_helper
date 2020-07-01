@@ -2,6 +2,9 @@
 #include "video_receiver/video_track_receiver_impl.h"
 #include "media_render_util/video_render_util.h"
 
+//todo: include this in compilation flag
+#include "media_recorder_util/video_recorder_util.h"
+
 namespace grt {
 
 	std::unique_ptr< video_track_receiver>
@@ -10,7 +13,9 @@ namespace grt {
 		//narendra i think this function has to be replaced.
 		//i mean in case of recorder 
 		// we may like to call a function
-		//util::async_set_video_recorder
+		//it should be put into compilation flag.
+		//util::set_video_recorder(track_receiver.get(), sender, info);
+
 		util::async_set_video_renderer(track_receiver.get(), sender, info);
 		return track_receiver;
 	}
