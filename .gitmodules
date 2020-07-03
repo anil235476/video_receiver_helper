@@ -1,4 +1,4 @@
-[submodule "rendering_server_client"]
-	path = rendering_server_client
-	url = https://github.com/anil235476/rendering_server_client
+[submodule "rendering_server_client"]	
+	path = rendering_server_client	
+	url = https://github.com/anil235476/rendering_server_client	
 	branch = master
