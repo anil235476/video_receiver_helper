@@ -12,9 +12,12 @@ endif(STAND_ALONE_BUILD)
 ADD_DEFINITIONS(-D_UNICODE)
 add_definitions(/ZI)
 
+#add_subdirectory(media_recorder_util)
 add_subdirectory(media_render_util)
 add_subdirectory(rendering_server_client)
 add_subdirectory(video_receiver)
+ #todo: this library should be added under a flag
+ add_subdirectory(media_recorder_util)
 
 if(MSVC)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
@@ -43,4 +46,5 @@ PUBLIC
 PRIVATE
     video_receiver
    media_render_util
+   #media_recorder_util
    )
