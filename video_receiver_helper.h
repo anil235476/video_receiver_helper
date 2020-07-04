@@ -16,12 +16,6 @@ namespace grt {
 
 	std::unique_ptr< video_track_receiver> 
 		set_video_renderer(webrtc::MediaStreamTrackInterface*, std::shared_ptr<grt::sender> sender, window_info info);
-
-#if 0 
-
-	std::unique_ptr< video_track_receiver>
-		set_video_recorder(webrtc::MediaStreamTrackInterface*, std::shared_ptr<grt::sender> sender, window_info info);
-#endif
 	void reset_video_renderer(std::shared_ptr<grt::sender> sender, std::string const& id);
 	void async_reset_video_renderer(std::shared_ptr<grt::sender> sender, std::string const& id);
 

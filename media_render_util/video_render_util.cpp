@@ -1,7 +1,7 @@
 #include "video_render_util.h"
 #include <cassert>
 #include "renderer.h"
-#include "recorder.h"
+//#include <frame_info.h>
 #include <thread>
 #include "rendering_server_client.h"
 #include "video_track_receiver.h"
@@ -11,22 +11,19 @@ namespace detail {
 
 	class video_receiver : public grt::video_frame_callback {
 	private:
-		std::shared_ptr<grt::renderer> renderer_;
 		HWND hwnd_;
 		const std::string id_;
 		std::shared_ptr<grt::sender> sender_;
-		grt::recorder recorder_;
-
+		std::shared_ptr<grt::renderer> renderer_;
 	public:
-		video_receiver(HWND hwnd, std::unique_ptr< grt::renderer>&& render, std::string id, std::shared_ptr<grt::sender> sender,  grt::recorder recorder)
-			:renderer_{ std::move(render) }, hwnd_{ hwnd }, id_{ id }, sender_{ sender }, recorder_{ std::move(recorder) }{
+		video_receiver(HWND hwnd, std::unique_ptr< grt::renderer>&& render, std::string id, std::shared_ptr<grt::sender> sender)
+			:renderer_{ std::move(render) }, hwnd_{ hwnd }, id_{ id }, sender_{ sender }{
 			auto r = SetWindowPos(hwnd_, HWND_TOPMOST,
 				0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE);
 			assert(r != 0);
 			assert(sender_);
 			assert(!id_.empty());
 		}
-
 		~video_receiver() override {
 			//todo: this is wrong design.
 			//should be improved
@@ -47,24 +44,21 @@ namespace detail {
 			auto frame_info = grt::make_frame_info(
 				frame.y_, frame.u_, frame.v_, frame.stride_y_,
 				frame.stride_u_, frame.stride_v_, frame.w_, frame.h_);
-			renderer_->render_frame(hwnd_, frame_info);
+				renderer_->render_frame(hwnd_, frame_info);
 			grt::clean(frame_info);
 		}
 
 		void on_frame(grt::rgb_frame frame) override {
 			auto frame_info = grt::make_frame_info(frame.data.data(), frame.w_, frame.h_);
-		//	auto recorder_frame_info = grt::recorder_make_frame_info(frame.data.data(), frame.w_, frame.h_);
 			renderer_->render_frame(hwnd_, frame_info);
-			recorder_.save_frame(frame_info);
 			grt::clean(frame_info);
 		}
 	};
 
-
 	std::unique_ptr< grt::video_frame_callback>
-		get_frame_receiver(HWND hwnd, std::unique_ptr< grt::renderer>&& render, std::string id, 
-			std::shared_ptr<grt::sender> sender, grt::recorder&& recorder) {
-		return std::make_unique< video_receiver>(hwnd, std::move(render), id, sender, std::move(recorder));
+		get_frame_receiver(HWND hwnd, std::unique_ptr< grt::renderer>&& render, std::string id,
+			std::shared_ptr<grt::sender> sender) {
+		return std::make_unique< video_receiver>(hwnd, std::move(render), id, sender);
 	}
 }
 
@@ -129,17 +123,15 @@ namespace util {
 	,std::string usr_name) {
 		//todo: create connection with display manager and ask for creating a window.
 		assert(receiver);
-
 		auto hwnd = find_child_window(class_name, parent_name, renderer_id);
-		
 		assert(hwnd);//rendering application with window should be running
 		if (hwnd == nullptr) return false;
 		auto renderer = grt::get_renderer();
 		renderer->render_name(hwnd, usr_name);
 		
-		auto frame_receiver = detail::get_frame_receiver(hwnd, std::move(renderer), id, sender, 
-			grt::recorder{ usr_name });
+		auto frame_receiver = detail::get_frame_receiver(hwnd, std::move(renderer), id, sender);
 		receiver->register_callback(std::move(frame_receiver));
+	
 		return true;
 	}
 
