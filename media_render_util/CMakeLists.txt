@@ -23,7 +23,8 @@ target_include_directories(media_render_util PUBLIC
 
 target_link_libraries(media_render_util PRIVATE 
 	    json_parser
-		video_render
 		video_receiver
 		rendering_server_client
+		video_render
 		)
+

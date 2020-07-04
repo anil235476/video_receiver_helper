@@ -11,8 +11,11 @@ endif(STAND_ALONE_BUILD)
 
 ADD_DEFINITIONS(-D_UNICODE)
 add_definitions(/ZI)
-
+if(ENABLE_RECORDER)
+add_subdirectory(media_recorder_util)
+else()
 add_subdirectory(media_render_util)
+endif(ENABLE_RECORDER)
 add_subdirectory(rendering_server_client)
 add_subdirectory(video_receiver)
 
@@ -35,12 +38,21 @@ PRIVATE
 	)
 
 target_link_libraries(video_receiver_helper 
-
 PUBLIC 
-
    rendering_server_client
   
 PRIVATE
     video_receiver
-   media_render_util
+	)
+
+if(ENABLE_RECORDER)
+target_link_libraries(video_receiver_helper 
+PRIVATE
+	 media_recorder_util
    )
+else()
+target_link_libraries(video_receiver_helper 
+PRIVATE
+    media_render_util
+	)
+endif(ENABLE_RECORDER)

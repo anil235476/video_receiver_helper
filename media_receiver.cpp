@@ -5,7 +5,6 @@
 
 namespace grt {
 	using lock = std::lock_guard<std::mutex>;
-
 	void video_receiver::set_sender(std::shared_ptr<sender> sender){
 		sender_ = sender;
 	}
@@ -26,8 +25,16 @@ namespace grt {
 			lock lck{ table_lck_ };
 			track_table_.emplace(info.id_, std::move(receiver));
 		}
-		
-								
+
+#if 0
+		auto recorder = set_video_recorder(
+			static_cast<webrtc::VideoTrackInterface*>(track.release()),
+			sender_, info);
+		{
+			lock lck{ table_lck_ };
+			track_table_.emplace(info.id_, std::move(recorder));
+		}							
+#endif
 	}
 
 	void  video_receiver::remove_track(std::string id, rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track) {
